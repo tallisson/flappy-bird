@@ -128,7 +128,7 @@ function criaFlappyBird() {
         somHit.play();
 
         setTimeout(() => {
-          mudaDeTela(Telas.INICIO);
+          changeScreen(Telas.INICIO);
         }, 500);
         return;
       }
@@ -270,7 +270,7 @@ function criaCanos() {
             telaAtiva.pauseSom();
           }
           alert('Você perdeu!');
-          mudaDeTela(Telas.INICIO);
+          changeScreen(Telas.INICIO);
         }
 
         if(par.x + canos.largura <= 0) {
@@ -286,16 +286,7 @@ function criaCanos() {
 //
 // Telas
 //
-function mudaDeTela(novaTela) {
-  telaAtiva = novaTela;
 
-  if(telaAtiva.inicializa) {
-    telaAtiva.inicializa();
-  }
-  if(telaAtiva.som) {
-    telaAtiva.som();
-  }
-}
 
 const Telas = {
   INICIO: {
@@ -311,7 +302,7 @@ const Telas = {
       mensagemGetReady.desenha();
     },
     click() {
-      mudaDeTela(Telas.JOGO);
+      changeScreen(Telas.JOGO);
     },
     atualiza() {
       globais.chao.atualiza();
@@ -349,16 +340,6 @@ Telas.JOGO = {
   }
 };
 
-function loop() {  
-  telaAtiva.desenha();
-  if(telaAtiva.atualiza) {
-    telaAtiva.atualiza();
-  }
-  
-  frames++;
-  requestAnimationFrame(loop);
-}
-
 window.addEventListener('click', () => {
   if(telaAtiva.click) {
     telaAtiva.click();
@@ -371,33 +352,36 @@ window.addEventListener('keydown', (event) => {
   }
 });
 
-class Game {
-  _screen;
+// TAD Screen
+class Screen {
+  _name;
+  init(){};
+  draw(){};
+  update(){};
+};
 
-  constructor(screen = Telas.INICIO) {
-    this._screen = screen;
-    telaAtiva = screen;
-    if(telaAtiva.inicializa) {
-      telaAtiva.inicializa();
-    }
-    if(telaAtiva.som) {
-      telaAtiva.som();
-    }
+function changeScreen(novaTela) {
+  telaAtiva = novaTela;
+
+  if(telaAtiva.inicializa) {
+    telaAtiva.inicializa();
   }
-
-  loop() {
-    telaAtiva.desenha();
-    if(telaAtiva.atualiza) {
-      telaAtiva.atualiza();
-    }
-    
-    frames++;
-    requestAnimationFrame(loop);
+  if(telaAtiva.som) {
+    telaAtiva.som();
   }
 }
 
-//mudaDeTela(Telas.INICIO);
-//loop();
-const game = new Game();
-game.loop();
+function loop() {  
+  telaAtiva.desenha();
+  if(telaAtiva.atualiza) {
+    telaAtiva.atualiza();
+  }
+  
+  frames++;
+  requestAnimationFrame(loop);
+}
 
+const main = (() => {
+  changeScreen(Telas.INICIO);
+  loop();
+})();
